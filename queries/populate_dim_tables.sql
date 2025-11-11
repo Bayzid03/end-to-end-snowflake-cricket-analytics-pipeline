@@ -83,3 +83,35 @@ from cricket.raw.match_raw_table
 limit 1;
 
 -- (Referee_dim can be populated later using extracted values)
+
+-- ------------------------------------------------------------
+-- VENUE DIMENSION
+-- ------------------------------------------------------------
+
+-- Step 1: Preview venue and city from curated match details
+select * from cricket.curated.match_detail_curated limit 10;
+
+-- Step 2: Select venue and city fields
+select venue, city
+from cricket.curated.match_detail_curated limit 10;
+
+-- Step 3: Group by venue and city to remove duplicates
+select venue, city
+from cricket.curated.match_detail_curated
+group by venue, city;
+
+-- Step 4: Insert into venue_dim, replacing null city with 'NA'
+insert into cricket.enriched.venue_dim (venue_name, city)
+select venue, 
+       case when city is null then 'NA' else city end as city
+from cricket.curated.match_detail_curated
+group by venue, city;
+
+-- Step 5: Verify venue_dim
+select * from cricket.enriched.venue_dim where city = 'Bengaluru';
+
+-- Step 6: Check for duplicate cities
+select city
+from cricket.enriched.venue_dim
+group by city
+having count(1) > 1;
