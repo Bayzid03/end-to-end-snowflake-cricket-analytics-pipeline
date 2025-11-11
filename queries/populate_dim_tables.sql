@@ -1,8 +1,7 @@
 -- ============================================================
 -- POPULATING DIMENSION TABLES FROM CURATED MATCH DATA
 -- ============================================================
--- Since we don’t have separate master datasets, we derive dimension values
--- directly from curated match detail tables. In real-world projects,
+-- Since we don’t have separate master datasets, we derive dimension values directly from curated match detail tables. In real-world projects,
 -- master data often comes from official registries (teams, venues, referees).
 -- ============================================================
 
@@ -115,3 +114,24 @@ select city
 from cricket.enriched.venue_dim
 group by city
 having count(1) > 1;
+
+-- ------------------------------------------------------------
+-- MATCH TYPE DIMENSION
+-- ------------------------------------------------------------
+
+-- Step 1: Preview match types from curated match details
+select * from cricket.curated.match_detail_curated limit 10;
+
+-- Step 2: Extract distinct match types (Test, ODI, T20, etc.)
+select match_type
+from cricket.curated.match_detail_curated
+group by match_type;
+
+-- Step 3: Insert unique match types into match_type_dim
+insert into cricket.enriched.match_type_dim (match_type)
+select match_type
+from cricket.curated.match_detail_curated
+group by match_type;
+
+-- Step 4: Verify match_type_dim
+select * from cricket.enriched.match_type_dim;
