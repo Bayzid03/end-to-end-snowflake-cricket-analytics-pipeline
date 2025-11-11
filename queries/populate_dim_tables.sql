@@ -61,3 +61,25 @@ join cricket.enriched.team_dim b
 
 -- Step 5: Verify player_dim
 select * from cricket.enriched.player_dim;
+
+-- ------------------------------------------------------------
+-- REFEREE DIMENSION
+-- ------------------------------------------------------------
+
+-- Step 1: Preview curated match details
+select * from cricket.curated.match_detail_curated limit 10;
+
+-- Step 2: Inspect raw JSON structure for officials
+select info from cricket.raw.match_raw_table limit 1;
+
+-- Step 3: Extract referee and umpire details from JSON fields
+select
+     info:officials.match_referees[0]::text as match_referee,
+     info:officials.reserve_umpires[0]::text as reserve_umpire,
+     info:officials.tv_umpires[0]::text as tv_umpire,
+     info:officials.umpires[0]::text as first_umpire,
+     info:officials.umpires[1]::text as second_umpire
+from cricket.raw.match_raw_table
+limit 1;
+
+-- (Referee_dim can be populated later using extracted values)
