@@ -39,3 +39,21 @@ join date_dim dd on m.event_date = dd.full_dt
 join team_dim ftd on m.first_team = ftd.team_name
 join team_dim std on m.second_team = std.team_name
 where m.match_type_number = 4686;
+
+-- ------------------------------------------------------------
+-- v3: Add Match Type Dimension
+-- ------------------------------------------------------------
+-- Join match_type field with match_type_dim to get match_type_id.
+select 
+    m.match_type_number as match_id,
+    dd.date_id,
+    0 as referee_id,
+    ftd.team_id,
+    std.team_id,
+    mtd.match_type_id   -- match type ID
+from cricket.curated.match_detail_curated m
+join date_dim dd on m.event_date = dd.full_dt
+join team_dim ftd on m.first_team = ftd.team_name
+join team_dim std on m.second_team = std.team_name
+join match_type_dim mtd on m.match_type = mtd.match_type
+where m.match_type_number = 4686;
