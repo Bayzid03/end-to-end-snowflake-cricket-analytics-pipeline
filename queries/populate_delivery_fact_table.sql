@@ -89,3 +89,27 @@ CREATE or replace TABLE delivery_fact (
     CONSTRAINT fk_batter FOREIGN KEY (batter_id) REFERENCES player_dim (player_id),
     CONSTRAINT fk_striker FOREIGN KEY (non_striker_id) REFERENCES player_dim (player_id)
 );
+
+-- ------------------------------------------------------------
+-- Insert Records into Delivery Fact
+-- ------------------------------------------------------------
+-- Populate delivery_fact by joining delivery_curated_table with team and player dimensions.
+-- Null values are replaced with defaults (0 for numbers, 'None' for text).
+insert into delivery_fact
+select 
+    d.match_type_number as match_id,
+    td.team_id,
+    bpd.player_id as bowler_id, 
+    spd.player_id as batter_id, 
+    nspd.player_id as non_striker_id,
+    d.over,
+    d.runs,
+    case when d.extra_runs is null then 0 else d.extra_runs end as extra_runs,
+    case when d.extra_type is null then 'None' else d.extra_type end as extra_type,
+    case when d.player_out is null then 'None' else d.player_out end as player_out,
+    case when d.player_out_kind is null then 'None' else d.player_out_kind end as player_out_kind
+from cricket.curated.delivery_curated_table d
+join team_dim td on d.team_name = td.team_name
+join player_dim bpd on d.bowler = bpd.player_name
+join player_dim spd on d.batter = spd.player_name
+join player_dim nspd on d.non_striker = nspd.player_name;
