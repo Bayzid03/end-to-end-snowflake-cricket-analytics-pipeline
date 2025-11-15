@@ -44,3 +44,24 @@ join player_dim bpd on d.bowler = bpd.player_name
 join player_dim spd on d.batter = spd.player_name
 join player_dim nspd on d.non_striker = nspd.player_name
 where d.match_type_number = 4686;
+
+-- ------------------------------------------------------------
+-- v3: Add Delivery Measurements
+-- ------------------------------------------------------------
+-- Include delivery-level metrics: over, runs, extras, and extra type.
+select 
+    d.match_type_number as match_id,
+    td.team_id,
+    bpd.player_id as bowler_id, bpd.player_name as bowler,
+    spd.player_id as batter_id, spd.player_name as striker,
+    nspd.player_id as non_striker_id, nspd.player_name as non_striker,
+    d.over,
+    d.runs,
+    d.extra_runs,
+    d.extra_type
+from cricket.curated.delivery_curated_table d
+join team_dim td on d.team_name = td.team_name
+join player_dim bpd on d.bowler = bpd.player_name
+join player_dim spd on d.batter = spd.player_name
+join player_dim nspd on d.non_striker = nspd.player_name
+where d.match_type_number = 4686;
